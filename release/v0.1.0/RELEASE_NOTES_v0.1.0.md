@@ -1,4 +1,4 @@
-# Global App Compat Assistant v0.1.0
+# GMS 助手 / GMS Helper v0.1.0
 
 Free MVP / Early Release。
 

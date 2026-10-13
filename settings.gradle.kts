@@ -14,7 +14,7 @@ dependencyResolutionManagement {
     }
 }
 
-rootProject.name = "global-app-compat-assistant"
+rootProject.name = "android-gms-helper"
 include(":app")
 include(":catalog-core")
 include(":catalog-audit")

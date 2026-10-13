@@ -1,25 +1,30 @@
-# Global App Compat Assistant
+# GMS 助手
 
-一个免费、原生 Android 的设备环境检测与 Google 运行环境诊断工具。项目使用 Kotlin + Jetpack Compose，不依赖 GMS 才能启动。
+**GMS Helper**
 
-当前阶段：`0.1.0` Free MVP / Early Release。正式 APK 仅使用项目负责人持有的发布密钥签名，并通过 GitHub Release 分发。
+Google 登录异常？microG 不知道装对没有？ChatGPT / Chrome 认证有问题？
 
-## 设备兼容反馈 / 报告问题
+免费检测 Android / 华为 HarmonyOS 的 Google、GMS、microG 环境，找到问题并给出修复方案。
 
-[提交设备兼容反馈或报告问题](https://github.com/teainsky/global-app-compat-assistant/issues/new?template=compatibility-report.yml)
+[**Download APK**](https://github.com/teainsky/android-gms-helper/releases/latest) · **Free & Open Source** · **No Root** · **No Bootloader Unlock** · **No ROM Modification**
 
-未验证设备欢迎反馈，但反馈入口和检测能力不代表该设备已经获得支持或可以自动配置。请勿提交账号信息、设备唯一标识或未脱敏的私人数据。
+> Unofficial community tool. Not affiliated with Google or microG.
 
-## 它解决什么问题
+## 功能 / Features
 
-- 识别设备、Android/HarmonyOS 分支、ROM 与核心 Google 组件状态。
-- 区分“组件存在”“来源可信”“功能可用”和“Play 认证”，避免只看到包名就下结论。
-- 用签名 Catalog 和精确设备证据决定是否存在可信配置流程。
-- 对证据不足、系统分支不适用或校验失败的场景安全停止。
+- 检测 GMS / Google Play Services
+- 检测 microG 安装状态
+- Google 环境诊断
+- Chrome / ChatGPT 登录问题诊断
+- 已验证设备提供安全配置引导
 
-## 免费版支持范围
+GMS Helper is a free and open-source Android app for checking Google, GMS, and microG environments on Android and Huawei HarmonyOS devices. It helps identify Google sign-in and Chrome/ChatGPT authentication problems and provides safe guidance. Automatic configuration is available only for exactly verified device and system profiles.
 
-免费 MVP 为已识别的主流设备环境提供检测与诊断，并为未知 Android 品牌保留安全的基础 fallback；实际覆盖范围以本表及应用内证据为准。
+## 免费版支持范围 / Free MVP scope
+
+免费 MVP 为主流 Android 设备提供检测和诊断，并为未知品牌保留安全的基础检测。品牌本身不决定兼容结论；相同品牌在不同系统、市场版本和 Google 环境下可能得到不同结果。
+
+The Free MVP provides detection and diagnostics for mainstream Android devices. Unknown Android brands receive safe basic diagnostics rather than an unsupported verdict. Device brand alone never determines a repair workflow.
 
 | 设备/环境 | 检测 | Google 诊断 | 已验证配置 |
 | --- | --- | --- | --- |
@@ -29,97 +34,97 @@
 | Samsung、Pixel | ✅ | ✅ | 仅在健康证据充分时显示无需处理 |
 | Motorola、TECNO/Infinix/itel、Nothing | ✅ | ✅ | ❌ |
 | 未知 Android 品牌 | 基础检测 | 基础诊断 | ❌ |
-| HarmonyOS 5/6 原生分支 | ✅ | ✅ | 不进入旧鸿蒙流程 |
+| HarmonyOS 5/6 原生分支或第三方兼容环境 | ✅ | ✅ | 不进入旧鸿蒙流程 |
 
-品牌不是兼容结论。相同品牌在不同系统、市场版本和 Google 环境下可以得到不同结果；市场版本没有可信证据时保持 `UNKNOWN`。
+未验证设备欢迎反馈，但“可检测”或“可诊断”不代表已经支持自动配置。
 
-## 当前已验证设备
+Unverified devices are welcome in compatibility reports, but detection or diagnostics do not mean that automatic configuration is supported.
+
+## 当前深度验证 / Currently verified device
 
 - Huawei Pura 70 Pro+
-- 型号：`HBN-AL80`
-- 系统：HarmonyOS `4.2.0`
-- Android API：`31`
-- 组件版本：microG Huawei `v0.3.16.252432`
+- 型号 / Model: `HBN-AL80`
+- 系统 / OS: HarmonyOS `4.2.0`
+- Android API: `31`
+- 组件 / Components: microG Huawei `v0.3.16.252432`
 
-验证记录只绑定以上精确设备与系统画像，不自动扩展到 HarmonyOS 4.3、5/6、其他 Pura 或相似 Huawei 型号。
+该验证只绑定以上精确设备与系统画像，不自动扩展到 HarmonyOS 4.3、5/6、其他 Pura 或相似 Huawei 型号。
 
-## 使用流程
+This verification applies only to the exact device and system profile above. It does not extend to HarmonyOS 4.3, HarmonyOS 5/6, other Pura models, or similar Huawei devices.
 
-1. 打开应用，点击“开始检测”。
-2. 查看“可检测 / 可诊断 / 已验证可配置”能力标签。
-3. 阅读 Google 环境说明并完成三项真实使用确认。
-4. 只有精确匹配已签名 `DEVICE_VERIFIED` 记录的设备，才会显示配置入口。
-5. 遇到失败时按应用内“常见错误 / 恢复说明”重试或提交 Issue。
+## 使用流程 / How to use
 
-## RC2 截图位置
+1. 下载并安装最新 APK。
+2. 打开 GMS 助手，点击“开始检测”。
+3. 查看“可检测 / 可诊断 / 已验证可配置”能力标签和 Google 环境说明。
+4. 按实际情况完成 Google、ChatGPT、Chrome 的真实使用确认。
+5. 只有精确验证过的设备和系统才会显示安全配置入口。
 
-以下位置将在两台目标真机完成 RC2 冒烟后替换为真实运行截图，不使用设计稿或模拟图：
+Download the latest APK, tap **Start detection**, review the Google environment diagnosis, and record actual Google/ChatGPT/Chrome results. Configuration remains locked unless the exact device and system profile has trusted verification.
 
-1. 首屏：开始检测与免费版说明（`docs/screenshots/01-start.png`）
-2. HBN-AL80：能力标签与当前无需处理（`docs/screenshots/02-hbn-result.png`）
-3. 真实使用确认：三项确认与恢复说明（`docs/screenshots/03-self-check.png`）
-4. HarmonyOS 6.1 + 卓易通：仅诊断、无配置入口（`docs/screenshots/04-harmony61-diagnostic.png`）
-
-截图内容与隐私处理要求见 [RC2 截图计划](docs/screenshots/README.md)。
-
-## 安全边界
+## 安全与隐私 / Safety and privacy
 
 - 不 Root，不解锁 Bootloader，不修改 ROM。
 - 不静默安装，不绕过 Android 系统确认，不自动卸载已有组件。
 - 不读取 Google 账号内容、IMEI、手机号、Android ID、序列号、MAC、联系人或 SIM 标识。
-- 默认完全本地运行，不上传检测结果。
-- 不使用第三方 APK 镜像；组件与规则证据失败时 fail closed。
-- 未达到精确 `DEVICE_VERIFIED` 的设备不能解锁真实配置执行器。
+- 默认在本机完成检测和诊断，不上传检测结果。
+- 不使用第三方 APK 镜像；组件或规则证据校验失败时安全停止。
 
-## 已知限制
+No root, bootloader unlock, or ROM modification is required. Detection is local by default. The app does not read account contents or device-unique identifiers, silently install packages, or fall back to third-party APK mirrors.
 
-- 当前只有一条精确实机验证记录，其他主流 Android 设备以检测和诊断为主。
-- “组件完整”不等于可信、功能健康或通过 Play 认证。
-- HarmonyOS 5/6 不适用现有 HarmonyOS 1–4 Android 兼容流程。
-- OEM 文件权限可能限制本机 APK 原文件审计。
+## 已知限制 / Known limitations
+
+- 当前只有一条精确实机验证记录；其他主流 Android 设备以检测和诊断为主。
+- “组件完整”不等于来源可信、功能健康或通过 Play 认证。
+- HarmonyOS 5/6 与第三方兼容运行环境目前仅诊断，不进入 HarmonyOS 1–4 配置流程。
 - TikTok 不在首版支持范围。
-- 首版不包含账号、支付、广告、会员或后台服务。
-- 项目不对未列明应用作可用性承诺；结论只覆盖界面明确显示的检测、诊断和精确验证范围。
+- 不保证所有手机可配置，也不保证所有 Google 应用可用。
 
-## 常见问题
+Only one exact device profile is deeply verified today. HarmonyOS 5/6 and third-party compatibility runtimes are diagnostic-only. The project does not promise configuration for every phone or compatibility with every Google app. TikTok is outside the current scope.
+
+## 设备兼容反馈 / Report an issue
+
+[**提交设备兼容反馈 / Report device compatibility**](https://github.com/teainsky/android-gms-helper/issues/new?template=compatibility-report.yml)
+
+请勿提交账号信息、设备唯一标识或未脱敏的私人数据。未验证设备欢迎反馈，不代表已经支持。
+
+Do not include account data, unique device identifiers, or unredacted personal information. Reports for unverified devices are welcome but do not mean those devices are supported.
+
+## 常见问题 / FAQ
 
 ### 为什么我的手机只能诊断，不能配置？
 
-真实配置只对精确设备、系统、可信组件和签名规则均通过验证的画像开放。品牌相同不代表可继承验证结论。
+真实配置只对精确设备、系统、可信组件和签名规则均通过验证的画像开放。品牌相同不代表可以继承验证结论。
 
 ### 检测到 Google 包，为什么没有显示“无需处理”？
 
 包存在只说明组件集合状态。应用还需要可信来源、功能健康或精确设备验证证据，才会给出“无需处理”。
 
-### 应用会修改手机吗？
-
-检测与诊断是只读的。任何未来配置动作也必须经过安全门禁与 Android 系统用户确认。
-
 ### HarmonyOS 5/6 可以使用旧鸿蒙方案吗？
 
-不可以。原生 HarmonyOS 和无法确认版本的 Harmony 分支会与 HarmonyOS 1–4 流程隔离。
+不可以。HarmonyOS 5/6 原生分支和无法确认版本的 Harmony 分支与 HarmonyOS 1–4 流程严格隔离。
 
-## 反馈问题
+## 技术说明 / Technical details
 
-请使用 [设备兼容反馈 / 报告问题](https://github.com/teainsky/global-app-compat-assistant/issues/new?template=compatibility-report.yml)。未验证设备欢迎反馈，但不代表已经支持。不要提交账号信息、设备唯一标识或未脱敏的私人数据。
+应用把组件存在、组件可信度、功能健康和 Play Certification 分开评估。运行时规则来自已验证签名的 Catalog snapshot；自动配置只接受精确 `DEVICE_VERIFIED` 记录，并在下载和执行前再次核对设备、系统、版本、SHA-256 与签名证书。证据不足、规则不适用或校验失败时均 fail closed。
 
-## 隐私与许可证
+The runtime evaluates component presence, component trust, functional health, and Play Certification independently. Configuration requires an exact signed `DEVICE_VERIFIED` record and revalidates the device profile, catalog snapshot, package versions, SHA-256 hashes, and signer certificates before execution.
+
+## 文档 / Documentation
 
 - [正式隐私说明](PRIVACY.md)
 - [Apache License 2.0](LICENSE)
 - [第三方许可证边界](THIRD_PARTY_NOTICES.md)
-- [RC2 真机冒烟测试清单](docs/RC2-SMOKE-TEST.md)
+- [真机冒烟测试清单](docs/RELEASE-SMOKE-TEST.md)
 - [Release signing 配置](docs/RELEASE_SIGNING.md)
 
-## 开发验证
+## 开发验证 / Development verification
 
 ```powershell
 .\.toolchains\gradle-8.9\bin\gradle.bat assembleDebug
+.\.toolchains\gradle-8.9\bin\gradle.bat assembleRelease
 .\.toolchains\gradle-8.9\bin\gradle.bat testDebugUnitTest
 .\.toolchains\gradle-8.9\bin\gradle.bat lintDebug
+.\.toolchains\gradle-8.9\bin\gradle.bat verifyReleaseSigningHygiene
 git diff --check
 ```
-
-## 后续工具与项目
-
-这里预留轻量入口，用于未来独立的诊断工具或相关开源项目；首版不在应用内加入商业化导流。
