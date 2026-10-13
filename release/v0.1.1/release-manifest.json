@@ -1,0 +1,9 @@
+{
+  "versionName": "0.1.1",
+  "versionCode": 2,
+  "apkFilename": "gms-helper-v0.1.1.apk",
+  "apkSha256": "44cf0da2e77754addc394c041fa7baa1634d578c1b8fb0c7da30ddd913159feb",
+  "signerCertificateSha256": "14c8e6cc6806941cda9e0b48d60316e9ff8b9dfd7be98b94ed5a41ce2290231a",
+  "githubRepository": "teainsky/android-gms-helper",
+  "updateApiUrl": "https://api.github.com/repos/teainsky/android-gms-helper/releases/latest"
+}
