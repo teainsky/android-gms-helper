@@ -1,4 +1,57 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <string name="app_name">GMS Helper</string>
+    <string name="diagnostics_title">Environment checkup</string>
+    <string name="diagnostic_status_normal">Normal</string>
+    <string name="diagnostic_status_needs_attention">Needs attention</string>
+    <string name="diagnostic_status_not_tested">Not tested</string>
+    <string name="diagnostic_how_to_fix">How to fix</string>
+    <string name="diagnostic_status_label">Status</string>
+    <string name="diagnostic_unknown">Unknown</string>
+    <string name="diagnostic_installed_enabled">Installed and enabled</string>
+    <string name="diagnostic_installed_disabled">Installed but disabled</string>
+    <string name="diagnostic_not_installed">Not installed</string>
+    <string name="diagnostic_yes">Available</string>
+    <string name="diagnostic_no">Unavailable</string>
+
+    <string name="microg_health_title">microG checkup</string>
+    <string name="microg_health_normal">Services and Companion are installed, enabled, and expose readable version metadata.</string>
+    <string name="microg_health_attention">A microG component is missing, disabled, or has unreadable version metadata. Check its app settings.</string>
+    <string name="microg_health_not_tested">No identifiable microG environment was detected.</string>
+    <string name="microg_services_label">microG Services</string>
+    <string name="microg_companion_label">microG Companion</string>
+    <string name="microg_open_self_check">Open microG Self-Check</string>
+
+    <string name="play_conflict_title">Google Play conflict check</string>
+    <string name="play_current_implementation_label">Current implementation</string>
+    <string name="play_implementation_official">Official Google Play Store</string>
+    <string name="play_implementation_companion">microG Companion</string>
+    <string name="play_implementation_unknown">Unknown implementation</string>
+    <string name="play_implementation_missing">Not installed</string>
+    <string name="play_companion_warning">This package is microG Companion. Do not overwrite it with an official Play Store APK; Android may reject it because the signatures do not match.</string>
+    <string name="play_unknown_warning">The current com.android.vending implementation cannot be identified safely. Do not overwrite it directly.</string>
+    <string name="play_open_settings">Open companion app settings</string>
+
+    <string name="login_chain_title">Sign-in authentication chain</string>
+    <string name="login_chain_normal">The default browser, Chrome, WebView, and Custom Tabs chain is available.</string>
+    <string name="login_chain_attention_google_ok">The Google environment is healthy, but the browser authentication chain may have a problem.</string>
+    <string name="login_chain_attention">The browser authentication chain may have a problem. Check the default browser, Chrome, and WebView.</string>
+    <string name="login_chain_not_tested">The authentication chain has not been fully tested.</string>
+    <string name="default_browser_label">Default browser</string>
+    <string name="chrome_status_label">Chrome</string>
+    <string name="webview_status_label">Android System WebView</string>
+    <string name="custom_tabs_status_label">Custom Tabs</string>
+    <string name="login_open_chrome_settings">Open Chrome system settings</string>
+    <string name="login_open_webview_settings">Open WebView system settings</string>
+
+    <string name="system_status_title">Lightweight system status</string>
+    <string name="system_status_normal">Storage space and the GMS Helper cache look normal.</string>
+    <string name="system_status_attention">Storage is low or the GMS Helper cache is large. You can address it safely.</string>
+    <string name="system_status_not_tested">The system did not expose storage status.</string>
+    <string name="available_storage_label">Available storage</string>
+    <string name="app_cache_label">GMS Helper cache</string>
+    <string name="system_storage_threshold_note">A warning appears below 1 GB. Private files are never scanned.</string>
+    <string name="system_clear_app_cache">Clear GMS Helper cache</string>
+    <string name="system_cache_cleared">The GMS Helper cache was cleared and diagnostics were refreshed.</string>
+    <string name="diagnostic_settings_unavailable">The system settings screen is unavailable.</string>
 </resources>

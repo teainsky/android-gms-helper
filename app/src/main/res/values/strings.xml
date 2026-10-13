@@ -1,4 +1,57 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <string name="app_name">GMS 助手</string>
+    <string name="diagnostics_title">环境体检</string>
+    <string name="diagnostic_status_normal">正常</string>
+    <string name="diagnostic_status_needs_attention">需要处理</string>
+    <string name="diagnostic_status_not_tested">未测试</string>
+    <string name="diagnostic_how_to_fix">怎么修</string>
+    <string name="diagnostic_status_label">状态</string>
+    <string name="diagnostic_unknown">未知</string>
+    <string name="diagnostic_installed_enabled">已安装并启用</string>
+    <string name="diagnostic_installed_disabled">已安装但未启用</string>
+    <string name="diagnostic_not_installed">未安装</string>
+    <string name="diagnostic_yes">支持</string>
+    <string name="diagnostic_no">不支持</string>
+
+    <string name="microg_health_title">microG 体检</string>
+    <string name="microg_health_normal">Services 与 Companion 已安装、启用，版本信息可读取。</string>
+    <string name="microg_health_attention">microG 组件缺失、停用或版本信息异常，请检查组件设置。</string>
+    <string name="microg_health_not_tested">未检测到可确认的 microG 环境。</string>
+    <string name="microg_services_label">microG Services</string>
+    <string name="microg_companion_label">microG Companion</string>
+    <string name="microg_open_self_check">打开 microG Self-Check</string>
+
+    <string name="play_conflict_title">Google Play 冲突诊断</string>
+    <string name="play_current_implementation_label">当前实现</string>
+    <string name="play_implementation_official">官方 Google Play Store</string>
+    <string name="play_implementation_companion">microG Companion</string>
+    <string name="play_implementation_unknown">未知实现</string>
+    <string name="play_implementation_missing">未安装</string>
+    <string name="play_companion_warning">当前是 microG Companion。不要直接用官方 Play Store APK 覆盖，否则可能出现“签名不一致，无法安装”。</string>
+    <string name="play_unknown_warning">无法安全确认当前 com.android.vending 的实现来源，请勿直接覆盖安装。</string>
+    <string name="play_open_settings">打开配套组件系统设置</string>
+
+    <string name="login_chain_title">登录认证链路诊断</string>
+    <string name="login_chain_normal">默认浏览器、Chrome、WebView 与 Custom Tabs 链路可用。</string>
+    <string name="login_chain_attention_google_ok">Google 环境正常，但浏览器认证链路可能异常。</string>
+    <string name="login_chain_attention">浏览器认证链路可能异常，请检查默认浏览器、Chrome 与 WebView。</string>
+    <string name="login_chain_not_tested">认证链路尚未完成检测。</string>
+    <string name="default_browser_label">默认浏览器</string>
+    <string name="chrome_status_label">Chrome</string>
+    <string name="webview_status_label">Android System WebView</string>
+    <string name="custom_tabs_status_label">Custom Tabs</string>
+    <string name="login_open_chrome_settings">打开 Chrome 系统设置</string>
+    <string name="login_open_webview_settings">打开 WebView 系统设置</string>
+
+    <string name="system_status_title">轻量系统状态</string>
+    <string name="system_status_normal">存储空间与 GMS 助手缓存状态正常。</string>
+    <string name="system_status_attention">存储空间不足或 GMS 助手缓存较大，可按需处理。</string>
+    <string name="system_status_not_tested">系统未允许读取存储状态。</string>
+    <string name="available_storage_label">剩余存储空间</string>
+    <string name="app_cache_label">GMS 助手缓存</string>
+    <string name="system_storage_threshold_note">少于 1 GB 时提示处理；不会扫描私人文件。</string>
+    <string name="system_clear_app_cache">清理 GMS 助手缓存</string>
+    <string name="system_cache_cleared">已清理 GMS 助手自身缓存，并重新检测。</string>
+    <string name="diagnostic_settings_unavailable">系统设置入口不可用。</string>
 </resources>

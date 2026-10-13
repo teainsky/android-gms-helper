@@ -12,6 +12,8 @@ GMS 助手（GMS Helper）免费 MVP 默认在设备本地完成检测、诊断�
 - 系统信息：Android API、Android 版本、安全补丁、系统构建显示值、增量版本和构建 fingerprint；
 - ROM 信息：一组明确列入代码的 ROM/HarmonyOS 系统属性，用于识别 HarmonyOS、HyperOS、ColorOS、OriginOS、One UI 等系统分支；
 - 组件信息：`com.google.android.gms`、`com.android.vending`、`com.huawei.hwid` 是否存在、是否启用及版本；
+- 登录认证链路信息：默认浏览器包名、Chrome 是否存在和启用、当前 Android System WebView 包名及 Custom Tabs 能力；
+- 轻量系统状态：应用可用的剩余存储空间与 GMS 助手自身缓存大小；不会扫描全手机文件或私人文件内容；
 - 可信比对信息：Google 两个核心组件的包名、版本、系统报告的签名证书 SHA-256 和系统允许返回的安装来源；
 - 用户主动填写的三项真实使用确认结果：Google 账号登录、ChatGPT 使用、Chrome 登录 Google 是否成功；
 - 诊断时间、规则版本与规则摘要，用于说明本次结论依据的规则版本。
@@ -43,7 +45,7 @@ GMS 助手（GMS Helper）免费 MVP 默认在设备本地完成检测、诊断�
 - `INTERNET`：用于每日限频的 GitHub 版本检查、用户主动确认的应用更新下载，以及官方组件准备流程；普通设备检测不会上传数据。
 - `POST_NOTIFICATIONS`：Android 13 及以上用于在发现新版本时显示系统通知；用户拒绝后仍可在应用内查看更新状态。
 - `REQUEST_INSTALL_PACKAGES`：为受严格门禁控制的 Android 官方用户确认式安装执行器预留；未精确匹配 `DEVICE_VERIFIED` 时不能进入执行流程。
-- 软件包可见性仅声明 Google Play Services、Google Play Store 与 HMS Core；应用不申请 `QUERY_ALL_PACKAGES`。
+- 软件包可见性仅声明 Google Play Services、Google Play Store、HMS Core、Chrome，以及处理 HTTPS/Custom Tabs 所需的查询；应用不申请 `QUERY_ALL_PACKAGES`。
 
 ## 用户控制与数据删除
 

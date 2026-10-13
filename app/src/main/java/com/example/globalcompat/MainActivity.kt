@@ -2,8 +2,11 @@ package com.example.globalcompat
 
 import android.Manifest
 import android.content.Intent
+import android.net.Uri
 import android.os.Build
 import android.os.Bundle
+import android.provider.Settings
+import android.widget.Toast
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.compose.setContent
@@ -43,6 +46,7 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import com.example.globalcompat.baseline.DeviceBaselineScanResult
@@ -66,6 +70,11 @@ import com.example.globalcompat.data.FreeMvpConfigurationStatus
 import com.example.globalcompat.data.PlatformFamily
 import com.example.globalcompat.data.RuntimeEnvironment
 import com.example.globalcompat.data.SystemComponent
+import com.example.globalcompat.diagnostics.DiagnosticStatus
+import com.example.globalcompat.diagnostics.HealthDiagnosticsEvaluator
+import com.example.globalcompat.diagnostics.HealthDiagnosticsReport
+import com.example.globalcompat.diagnostics.PackageDiagnostic
+import com.example.globalcompat.diagnostics.PlayStoreImplementation
 import com.example.globalcompat.installation.InstallationBlockReason
 import com.example.globalcompat.installation.InstallationSessionPlan
 import com.example.globalcompat.installation.InstallationSessionStatus
@@ -134,6 +143,39 @@ private fun ScannerScreen(
     var activePreparation by remember { mutableStateOf<PreparationCancellation?>(null) }
     val scope = rememberCoroutineScope()
     val context = LocalContext.current
+    fun runScan(resetFunctionalValidation: Boolean) {
+        activePreparation?.cancel()
+        activePreparation = null
+        preparationProgress = null
+        preparationResult = null
+        isScanning = true
+        scope.launch {
+            scanResult = withContext(Dispatchers.IO) { scanner.scan() }
+            if (resetFunctionalValidation) {
+                functionalValidation = UserFunctionalValidation()
+            }
+            isScanning = false
+        }
+    }
+    val settingsLauncher = rememberLauncherForActivityResult(
+        ActivityResultContracts.StartActivityForResult(),
+    ) {
+        runScan(resetFunctionalValidation = false)
+    }
+    fun launchSystemScreen(intent: Intent) {
+        runCatching { settingsLauncher.launch(intent) }
+            .onFailure {
+                Toast.makeText(
+                    context,
+                    context.getString(R.string.diagnostic_settings_unavailable),
+                    Toast.LENGTH_SHORT,
+                ).show()
+            }
+    }
+    fun appSettingsIntent(packageName: String) = Intent(
+        Settings.ACTION_APPLICATION_DETAILS_SETTINGS,
+        Uri.parse("package:$packageName"),
+    )
     val releaseUpdater = remember(context.applicationContext) {
         AndroidReleaseUpdater(context.applicationContext)
     }
@@ -258,22 +300,44 @@ private fun ScannerScreen(
                 modifier = Modifier.padding(innerPadding),
                 onAbout = { showFreeMvpInfo = true },
                 onStart = {
-                    activePreparation?.cancel()
-                    activePreparation = null
-                    preparationProgress = null
-                    preparationResult = null
-                    isScanning = true
-                    scope.launch {
-                        scanResult = withContext(Dispatchers.IO) { scanner.scan() }
-                        functionalValidation = UserFunctionalValidation()
-                        isScanning = false
-                    }
+                    runScan(resetFunctionalValidation = true)
                 },
             )
             else -> EnvironmentReportView(
                 scanResult = checkNotNull(scanResult),
                 functionalValidation = functionalValidation,
                 onFunctionalValidationChange = { functionalValidation = it },
+                onOpenMicrogSelfCheck = {
+                    val launchIntent = context.packageManager.getLaunchIntentForPackage(
+                        HealthDiagnosticsEvaluator.GMS_PACKAGE,
+                    ) ?: appSettingsIntent(HealthDiagnosticsEvaluator.GMS_PACKAGE)
+                    launchSystemScreen(launchIntent)
+                },
+                onOpenPackageSettings = { packageName ->
+                    launchSystemScreen(appSettingsIntent(packageName))
+                },
+                onOpenDefaultAppsSettings = {
+                    launchSystemScreen(Intent(Settings.ACTION_MANAGE_DEFAULT_APPS_SETTINGS))
+                },
+                onOpenAppsSettings = {
+                    launchSystemScreen(Intent(Settings.ACTION_MANAGE_APPLICATIONS_SETTINGS))
+                },
+                onOpenStorageSettings = {
+                    launchSystemScreen(Intent(Settings.ACTION_INTERNAL_STORAGE_SETTINGS))
+                },
+                onClearAppCache = {
+                    scope.launch {
+                        withContext(Dispatchers.IO) {
+                            context.cacheDir.listFiles()?.forEach(File::deleteRecursively)
+                        }
+                        Toast.makeText(
+                            context,
+                            context.getString(R.string.system_cache_cleared),
+                            Toast.LENGTH_SHORT,
+                        ).show()
+                        runScan(resetFunctionalValidation = false)
+                    }
+                },
                 onAbout = { showFreeMvpInfo = true },
                 updateAvailable = updateState.status == ReleaseUpdateStatus.UPDATE_AVAILABLE,
                 preparationProgress = preparationProgress,
@@ -385,6 +449,12 @@ private fun EnvironmentReportView(
     scanResult: DeviceBaselineScanResult,
     functionalValidation: UserFunctionalValidation,
     onFunctionalValidationChange: (UserFunctionalValidation) -> Unit,
+    onOpenMicrogSelfCheck: () -> Unit,
+    onOpenPackageSettings: (String) -> Unit,
+    onOpenDefaultAppsSettings: () -> Unit,
+    onOpenAppsSettings: () -> Unit,
+    onOpenStorageSettings: () -> Unit,
+    onClearAppCache: () -> Unit,
     onAbout: () -> Unit,
     updateAvailable: Boolean,
     preparationProgress: EnvironmentPreparationProgress?,
@@ -468,6 +538,17 @@ private fun EnvironmentReportView(
             UserValidationSection(
                 validation = functionalValidation,
                 onChange = onFunctionalValidationChange,
+            )
+        }
+        item {
+            HealthDiagnosticsCard(
+                report = scanResult.healthDiagnostics,
+                onOpenMicrogSelfCheck = onOpenMicrogSelfCheck,
+                onOpenPackageSettings = onOpenPackageSettings,
+                onOpenDefaultAppsSettings = onOpenDefaultAppsSettings,
+                onOpenAppsSettings = onOpenAppsSettings,
+                onOpenStorageSettings = onOpenStorageSettings,
+                onClearAppCache = onClearAppCache,
             )
         }
         item { RecoveryGuidanceCard() }
@@ -629,6 +710,249 @@ private fun ReleaseUpdateCard(
             style = MaterialTheme.typography.bodySmall,
         )
     }
+}
+
+@Composable
+private fun HealthDiagnosticsCard(
+    report: HealthDiagnosticsReport,
+    onOpenMicrogSelfCheck: () -> Unit,
+    onOpenPackageSettings: (String) -> Unit,
+    onOpenDefaultAppsSettings: () -> Unit,
+    onOpenAppsSettings: () -> Unit,
+    onOpenStorageSettings: () -> Unit,
+    onClearAppCache: () -> Unit,
+) {
+    Column(verticalArrangement = Arrangement.spacedBy(12.dp)) {
+        Text(
+            text = stringResource(R.string.diagnostics_title),
+            style = MaterialTheme.typography.titleLarge,
+            fontWeight = FontWeight.Bold,
+        )
+        ReportSection(stringResource(R.string.microg_health_title)) {
+            DiagnosticStatusRow(report.microg.status)
+            Text(
+                stringResource(
+                    when (report.microg.status) {
+                        DiagnosticStatus.NORMAL -> R.string.microg_health_normal
+                        DiagnosticStatus.NEEDS_ATTENTION -> R.string.microg_health_attention
+                        DiagnosticStatus.NOT_TESTED -> R.string.microg_health_not_tested
+                    },
+                ),
+            )
+            ReportRow(
+                stringResource(R.string.microg_services_label),
+                report.microg.services.userPackageStatus(),
+            )
+            ReportRow(
+                stringResource(R.string.microg_companion_label),
+                report.microg.companion.userPackageStatus(),
+            )
+            when {
+                report.microg.selfCheckAvailable -> Button(
+                    modifier = Modifier.fillMaxWidth(),
+                    onClick = onOpenMicrogSelfCheck,
+                ) {
+                    Text(stringResource(R.string.microg_open_self_check))
+                }
+
+                report.microg.status == DiagnosticStatus.NEEDS_ATTENTION -> Button(
+                    modifier = Modifier.fillMaxWidth(),
+                    onClick = {
+                        when {
+                            report.microg.services.installed ->
+                                onOpenPackageSettings(report.microg.services.packageName)
+                            report.microg.companion.installed ->
+                                onOpenPackageSettings(report.microg.companion.packageName)
+                            else -> onOpenAppsSettings()
+                        }
+                    },
+                ) {
+                    Text(stringResource(R.string.diagnostic_how_to_fix))
+                }
+            }
+        }
+        ReportSection(stringResource(R.string.play_conflict_title)) {
+            DiagnosticStatusRow(report.googlePlay.status)
+            val implementationText = stringResource(
+                when (report.googlePlay.implementation) {
+                    PlayStoreImplementation.OFFICIAL_PLAY_STORE ->
+                        R.string.play_implementation_official
+                    PlayStoreImplementation.MICROG_COMPANION ->
+                        R.string.play_implementation_companion
+                    PlayStoreImplementation.UNKNOWN -> R.string.play_implementation_unknown
+                    PlayStoreImplementation.NOT_INSTALLED -> R.string.play_implementation_missing
+                },
+            )
+            ReportRow(
+                stringResource(R.string.play_current_implementation_label),
+                implementationText,
+            )
+            when (report.googlePlay.implementation) {
+                PlayStoreImplementation.MICROG_COMPANION -> Text(
+                    stringResource(R.string.play_companion_warning),
+                    color = MaterialTheme.colorScheme.error,
+                )
+                PlayStoreImplementation.UNKNOWN -> Text(
+                    stringResource(R.string.play_unknown_warning),
+                    color = MaterialTheme.colorScheme.error,
+                )
+                else -> Unit
+            }
+            if (report.googlePlay.packageInfo.installed) {
+                OutlinedButton(
+                    modifier = Modifier.fillMaxWidth(),
+                    onClick = {
+                        onOpenPackageSettings(report.googlePlay.packageInfo.packageName)
+                    },
+                ) {
+                    Text(
+                        stringResource(
+                            if (report.googlePlay.status == DiagnosticStatus.NEEDS_ATTENTION) {
+                                R.string.diagnostic_how_to_fix
+                            } else {
+                                R.string.play_open_settings
+                            },
+                        ),
+                    )
+                }
+            } else if (report.googlePlay.status == DiagnosticStatus.NEEDS_ATTENTION) {
+                OutlinedButton(
+                    modifier = Modifier.fillMaxWidth(),
+                    onClick = onOpenAppsSettings,
+                ) {
+                    Text(stringResource(R.string.diagnostic_how_to_fix))
+                }
+            }
+        }
+        ReportSection(stringResource(R.string.login_chain_title)) {
+            DiagnosticStatusRow(report.loginAuthentication.status)
+            Text(
+                stringResource(
+                    when (report.loginAuthentication.status) {
+                        DiagnosticStatus.NORMAL -> R.string.login_chain_normal
+                        DiagnosticStatus.NOT_TESTED -> R.string.login_chain_not_tested
+                        DiagnosticStatus.NEEDS_ATTENTION ->
+                            if (report.loginAuthentication.googleEnvironmentEstablished) {
+                                R.string.login_chain_attention_google_ok
+                            } else {
+                                R.string.login_chain_attention
+                            }
+                    },
+                ),
+            )
+            ReportRow(
+                stringResource(R.string.default_browser_label),
+                report.loginAuthentication.defaultBrowserPackage
+                    ?: stringResource(R.string.diagnostic_unknown),
+            )
+            ReportRow(
+                stringResource(R.string.chrome_status_label),
+                report.loginAuthentication.chrome.userPackageStatus(),
+            )
+            ReportRow(
+                stringResource(R.string.webview_status_label),
+                report.loginAuthentication.webViewPackage
+                    ?: stringResource(R.string.diagnostic_unknown),
+            )
+            ReportRow(
+                stringResource(R.string.custom_tabs_status_label),
+                when (report.loginAuthentication.customTabsAvailable) {
+                    true -> stringResource(R.string.diagnostic_yes)
+                    false -> stringResource(R.string.diagnostic_no)
+                    null -> stringResource(R.string.diagnostic_status_not_tested)
+                },
+            )
+            if (report.loginAuthentication.status == DiagnosticStatus.NEEDS_ATTENTION) {
+                Button(
+                    modifier = Modifier.fillMaxWidth(),
+                    onClick = onOpenDefaultAppsSettings,
+                ) {
+                    Text(stringResource(R.string.diagnostic_how_to_fix))
+                }
+            }
+            if (report.loginAuthentication.chrome.installed) {
+                TextButton(
+                    onClick = {
+                        onOpenPackageSettings(report.loginAuthentication.chrome.packageName)
+                    },
+                ) {
+                    Text(stringResource(R.string.login_open_chrome_settings))
+                }
+            }
+            report.loginAuthentication.webViewPackage?.let { packageName ->
+                TextButton(onClick = { onOpenPackageSettings(packageName) }) {
+                    Text(stringResource(R.string.login_open_webview_settings))
+                }
+            }
+        }
+        ReportSection(stringResource(R.string.system_status_title)) {
+            DiagnosticStatusRow(report.systemStatus.status)
+            Text(
+                stringResource(
+                    when (report.systemStatus.status) {
+                        DiagnosticStatus.NORMAL -> R.string.system_status_normal
+                        DiagnosticStatus.NEEDS_ATTENTION -> R.string.system_status_attention
+                        DiagnosticStatus.NOT_TESTED -> R.string.system_status_not_tested
+                    },
+                ),
+            )
+            ReportRow(
+                stringResource(R.string.available_storage_label),
+                report.systemStatus.availableStorageBytes?.userFileSize()
+                    ?: stringResource(R.string.diagnostic_unknown),
+            )
+            ReportRow(
+                stringResource(R.string.app_cache_label),
+                report.systemStatus.appCacheBytes?.userFileSize()
+                    ?: stringResource(R.string.diagnostic_unknown),
+            )
+            Text(
+                stringResource(R.string.system_storage_threshold_note),
+                style = MaterialTheme.typography.bodySmall,
+            )
+            if (report.systemStatus.status == DiagnosticStatus.NEEDS_ATTENTION) {
+                Button(
+                    modifier = Modifier.fillMaxWidth(),
+                    onClick = onOpenStorageSettings,
+                ) {
+                    Text(stringResource(R.string.diagnostic_how_to_fix))
+                }
+            }
+            if ((report.systemStatus.appCacheBytes ?: 0L) > 0L) {
+                OutlinedButton(
+                    modifier = Modifier.fillMaxWidth(),
+                    onClick = onClearAppCache,
+                ) {
+                    Text(stringResource(R.string.system_clear_app_cache))
+                }
+            }
+        }
+    }
+}
+
+@Composable
+private fun DiagnosticStatusRow(status: DiagnosticStatus) {
+    ReportRow(
+        stringResource(R.string.diagnostic_status_label),
+        stringResource(
+            when (status) {
+                DiagnosticStatus.NORMAL -> R.string.diagnostic_status_normal
+                DiagnosticStatus.NEEDS_ATTENTION -> R.string.diagnostic_status_needs_attention
+                DiagnosticStatus.NOT_TESTED -> R.string.diagnostic_status_not_tested
+            },
+        ),
+    )
+}
+
+@Composable
+private fun PackageDiagnostic.userPackageStatus(): String {
+    val state = when {
+        !installed -> stringResource(R.string.diagnostic_not_installed)
+        enabled == false -> stringResource(R.string.diagnostic_installed_disabled)
+        else -> stringResource(R.string.diagnostic_installed_enabled)
+    }
+    val version = versionName?.takeIf(String::isNotBlank)
+    return if (version == null) state else "$state · $version"
 }
 
 @Composable

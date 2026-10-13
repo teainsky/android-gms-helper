@@ -7,6 +7,8 @@ import com.example.globalcompat.catalog.RuntimeTrustedCatalogRepository
 import com.example.globalcompat.catalog.TrustedCatalogRepository
 import com.example.globalcompat.data.DeviceEnvironmentScanner
 import com.example.globalcompat.data.EnvironmentReport
+import com.example.globalcompat.diagnostics.AndroidHealthDiagnosticsScanner
+import com.example.globalcompat.diagnostics.HealthDiagnosticsReport
 import com.example.globalcompat.installation.InstallationExecutionGate
 import com.example.globalcompat.installation.InstallationSessionPlan
 import com.example.globalcompat.installation.AndroidKeyStoreInstallAuthorizationSealer
@@ -16,6 +18,7 @@ import com.example.globalcompat.simulation.SimulatedInstallationPlanner
 data class DeviceBaselineScanResult(
     val environment: EnvironmentReport,
     val componentComparisons: List<OfficialComponentComparison>,
+    val healthDiagnostics: HealthDiagnosticsReport,
     val simulatedInstallationPlan: SimulatedInstallationPlan,
     val installationSessionPlan: InstallationSessionPlan,
     val catalogSnapshot: CatalogSnapshot?,
@@ -27,6 +30,8 @@ class DeviceBaselineScanner(
         RuntimeTrustedCatalogRepository.instance,
     private val fingerprintScanner: InstalledComponentFingerprintScanner =
         InstalledComponentFingerprintScanner(AndroidInstalledPackageLookup(context.packageManager)),
+    private val healthDiagnosticsScanner: AndroidHealthDiagnosticsScanner =
+        AndroidHealthDiagnosticsScanner(context.applicationContext),
 ) {
     private val authorizationSealer = AndroidKeyStoreInstallAuthorizationSealer()
 
@@ -43,6 +48,7 @@ class DeviceBaselineScanner(
                 romVersion = environment.rom.version,
             ),
         )
+        val healthDiagnostics = healthDiagnosticsScanner.scan(environment, comparisons)
         val simulatedPlan = SimulatedInstallationPlanner(snapshot).create(
             environment = environment,
             comparisons = comparisons,
@@ -50,6 +56,7 @@ class DeviceBaselineScanner(
         return DeviceBaselineScanResult(
             environment = environment,
             componentComparisons = comparisons,
+            healthDiagnostics = healthDiagnostics,
             simulatedInstallationPlan = simulatedPlan,
             installationSessionPlan = InstallationExecutionGate(
                 snapshot,
